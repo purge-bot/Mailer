@@ -1,0 +1,10 @@
+{
+  "MailSettings": {
+    "From": "yourEmail.email.com",
+    "Host": "smtp.email.com",
+    "Password": "yourPassword",
+    "Port": 555,
+    "UseSSL": true,
+    "IsBodyHtml": false
+  }
+}
