@@ -19,7 +19,7 @@ namespace Mailer.Services
         /// <param name="ToEmails">Список получателей.</param>
         /// <param name="subject">Заголовк сообщения.</param>
         /// <param name="body">Тело сообщения.</param>
-        public void SendMsgTo(List<string> ToEmails, string subject, string body)
+        public async Task SendMsgTo(List<string> ToEmails, string subject, string body)
         {          
             SmtpClient client = new SmtpClient(_settings.Host, 666);
             client.EnableSsl = _settings.UseSSL;
@@ -27,9 +27,16 @@ namespace Mailer.Services
             client.Credentials = new NetworkCredential(_settings.From, _settings.Password);
 
             var mailMessage = CreateMessage(ToEmails, subject, body);
-            client.Send(mailMessage);
+            await client.SendMailAsync(mailMessage);
+            client.Dispose();
         }
-
+        /// <summary>
+        /// Создать сообщение для отправки.
+        /// </summary>
+        /// <param name="ToEmails">Список получателей.</param>
+        /// <param name="subject">Заголовк сообщения.</param>
+        /// <param name="body">Тело сообщения.</param>
+        /// <returns>MailMessage содержащий информацию о сообщении.</returns>
         private MailMessage CreateMessage(List<string> ToEmails, string subject, string body)
         {
             MailMessage mailMessage = new MailMessage();

@@ -1,6 +1,6 @@
-﻿namespace Mailer.Infrastructure
+﻿namespace Mailer.ViewModels
 {
-    public class DataInstance
+    public class SentMsgViewModel
     {
         /// <summary>
         /// Дата отправки сообщения.

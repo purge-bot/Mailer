@@ -8,6 +8,6 @@
         /// <param name="ToEmails">Список получателей.</param>
         /// <param name="subject">Заголовк сообщения.</param>
         /// <param name="body">Тело сообщения.</param>
-        public void SendMsgTo(List<string> ToEmails, string subject, string body);
+        public Task SendMsgTo(List<string> ToEmails, string subject, string body);
     }
 }

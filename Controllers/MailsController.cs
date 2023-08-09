@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
 using Mailer.Models;
 using Microsoft.EntityFrameworkCore;
+using Mailer.ViewModels;
 
 namespace Mailer.Controllers
 {
@@ -24,13 +25,13 @@ namespace Mailer.Controllers
         /// </summary>
         /// <returns>Список в формате Json.</returns>
         [HttpGet]
-        public JsonResult Get()
+        public async Task<JsonResult> Get()
         {
-            var requests = _repository.Request.Include(p=>p.Message).Include(p=>p.FailedMessage).Include(p=>p.Result).Include(p=>p.Recipient);
-            List<DataInstance> instance = new List<DataInstance>();
+            var requests = await _repository.Request.Include(p=>p.Message).Include(p=>p.FailedMessage).Include(p=>p.Result).Include(p=>p.Recipient).ToListAsync();
+            List<SentMsgViewModel> messages = new List<SentMsgViewModel>();
             foreach (var req in requests)
             {
-                DataInstance inst = new DataInstance()
+                SentMsgViewModel message = new SentMsgViewModel()
                 {
                     SendDate = req.CreateDate.ToShortDateString(),
                     Recipient = req.Recipient.Email,
@@ -39,16 +40,16 @@ namespace Mailer.Controllers
                     Subject = req.Message.Subject,
                     Body = req.Message.Body
                 };
-                instance.Add(inst);
+                messages.Add(message);
             }
-            return new JsonResult(instance);
+            return new JsonResult(messages);
         }
         /// <summary>
         /// Отправить новое сообщение.
         /// </summary>
         /// <param name="paramInfo">Заголовок, тело и получатели сообщения в формате Json.</param>
         [HttpPost]
-        public void Post([FromBody] ParamInfo paramInfo)
+        public async void Post([FromBody] ParamInfo paramInfo)
         {
             List<string> emails = paramInfo.Recipients.ToList();
             Dictionary<string, string> successSendEmails = new Dictionary<string, string>();
@@ -61,7 +62,7 @@ namespace Mailer.Controllers
             _repository.Context.Add(msg);
             try
             {
-                _service.SendMsgTo(emails, paramInfo.Subject, paramInfo.Body);
+                await _service.SendMsgTo(emails, paramInfo.Subject, paramInfo.Body);
             }
             catch (SmtpException ex)
             {
